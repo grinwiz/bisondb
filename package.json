@@ -1,0 +1,33 @@
+{
+	"name": "bisondb",
+	"version": "1.0.0",
+	"description": "A lightweight BSON-based, document-oriented database for Node.js, Electron, and the browser — built for speed, simplicity, and happiness.",
+	"main": "index.js",
+	"keywords": [
+		"bson",
+		"nosql",
+		"documentdb",
+		"database",
+		"javascript",
+		"datastore",
+		"embedded"
+	],
+	"author": "SUJWN",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/grinwiz/bisondb.git"
+	},
+	"bugs": {
+		"url": "https://github.com/grinwiz/bisondb/issues"
+	},
+	"homepage": "https://github.com/grinwiz/bisondb#readme",
+	"scripts": {
+		"test": "node --test",
+		"lint": "eslint src",
+		"build": "echo 'No build step required for CommonJS'"
+	},
+	"dependencies": {
+		"bson": "^6.10.4"
+	}
+}
