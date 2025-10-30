@@ -1,20 +1,7 @@
-// bsonStreamUpdater.js
-// Async updater for collection .bson files
-// Supports MongoDB-like update operators: $set, $inc, $unset, $push
-// Supports returnDocument: 'after' | 'before'
-
 const fs = require('fs').promises;
-const { deserialize, serialize, ObjectId } = require('bson');
-const { matchesFilter } = require('./bsonStreamReader');
+const { deserialize, serialize } = require('bson');
+const { matchesFilter } = require('../utils/QueryMatcher');
 
-/**
- * updateOne - updates the first matching document
- * @param {string} filePath
- * @param {object} filter
- * @param {object} update
- * @param {object} options { returnDocument: 'after' | 'before' }
- * @returns {Promise<object>} Mongo-like result
- */
 async function updateOne(filePath, filter, update, options = {}) {
   const allDocs = await readAllDocs(filePath);
   let matchedCount = 0;
@@ -44,14 +31,6 @@ async function updateOne(filePath, filter, update, options = {}) {
   return resultDoc;
 }
 
-/**
- * updateMany - updates all matching documents
- * @param {string} filePath
- * @param {object} filter
- * @param {object} update
- * @param {object} options { returnDocument: 'after' | 'before' }
- * @returns {Promise<object>} Mongo-like result
- */
 async function updateMany(filePath, filter, update, options = {}) {
   const allDocs = await readAllDocs(filePath);
   let matchedCount = 0;
@@ -80,10 +59,6 @@ async function updateMany(filePath, filter, update, options = {}) {
   return resultDocs;
 }
 
-/**
- * Apply MongoDB-like update operators to a document
- * Supports $set, $inc, $unset, $push
- */
 function applyUpdateOperators(doc, update) {
   const newDoc = { ...doc };
   for (const op of Object.keys(update)) {
@@ -116,9 +91,6 @@ function applyUpdateOperators(doc, update) {
   return newDoc;
 }
 
-/**
- * Read all documents from a file
- */
 async function readAllDocs(filePath) {
   const docs = [];
   try {
@@ -140,9 +112,6 @@ async function readAllDocs(filePath) {
   return docs;
 }
 
-/**
- * Write all documents back to file (overwrite)
- */
 async function writeAllDocs(filePath, docs) {
   const parts = [];
   for (const doc of docs) {
