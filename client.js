@@ -1,4 +1,4 @@
-const { BisonDB } = require('./core/BisonDB.js');
+const { BisonDB } = require('./src/core/BisonDB.js');
 
 module.exports = { BisonDB };
 
