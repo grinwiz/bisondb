@@ -1,14 +1,6 @@
-// bsonStreamCompact.js
-// Async compactor for collection .bson files
-// Removes documents marked as _deleted to reclaim space
-
 const fs = require('fs').promises;
 const { deserialize, serialize } = require('bson');
 
-/**
- * compact - rewrites the collection file excluding _deleted documents
- * @param {string} filePath
- */
 async function compact(filePath) {
   let docs = [];
   try {

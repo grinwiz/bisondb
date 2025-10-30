@@ -1,19 +1,8 @@
-// bsonStreamReader.js
-// Async reader for collection .bson files (stream format)
-// Supports iterating documents with filters and projections
-
 const fs = require('fs').promises;
 const { deserialize, ObjectId } = require('bson');
-const path = require('path');
 
 const MAGIC = Buffer.from('BISONIDX\0'); // 8 bytes, last byte null to make 8
 
-/**
- * Read the latest index footer from the .bisondata file.
- * Returns a JS object (index). If file missing or no valid footer, returns { version:1, collections: {} }
- *
- * Footer layout: [indexBSON][uint32LE indexLen][8-byte magic]
- */
 function readLatestIndex(filePath) {
   if (!fs.existsSync(filePath)) return { version: 1, collections: {} };
 
@@ -47,10 +36,6 @@ function readLatestIndex(filePath) {
   return indexObj;
 }
 
-/**
- * Write index footer (append) with the index object.
- * Appends: [indexBSON][uint32LE indexLen][8-byte magic]
- */
 function writeIndexFooter(filePath, indexObj) {
   const indexBuf = serialize(indexObj);
   const lenBuf = Buffer.alloc(4);
@@ -61,15 +46,6 @@ function writeIndexFooter(filePath, indexObj) {
 }
 
 
-/**
- * Read all documents from a collection file.
- * Supports optional filter and projection.
- *
- * @param {string} filePath
- * @param {object} [filter] MongoDB-like filter object
- * @param {object} [projection] MongoDB-like projection { field: 1 }
- * @returns {Promise<object[]>}
- */
 async function readAll(filePath, filter = {}, projection = null) {
   const docs = [];
   try {
@@ -96,14 +72,6 @@ async function readAll(filePath, filter = {}, projection = null) {
   return docs;
 }
 
-/**
- * Matches a document against a MongoDB-like filter.
- * Supports $eq, $ne, $gt, $gte, $lt, $lte, $in, $nin, $and, $or, $not
- *
- * @param {object} doc
- * @param {object} filter
- * @returns {boolean}
- */
 function matchesFilter(doc, filter) {
   if (!filter || Object.keys(filter).length === 0) return true;
 
@@ -143,9 +111,6 @@ function matchesFilter(doc, filter) {
   return true;
 }
 
-/**
- * Compare two values (ObjectId + string-safe)
- */
 function areEqual(a, b) {
   if (a instanceof ObjectId && b instanceof ObjectId) {
     return a.equals(b);
@@ -159,9 +124,6 @@ function areEqual(a, b) {
   return a === b;
 }
 
-/**
- * Apply MongoDB-like operators + $like / $ilike
- */
 function applyOperator(docVal, op, v) {
   switch (op) {
     case '$eq':
@@ -202,14 +164,6 @@ function applyOperator(docVal, op, v) {
   }
 }
 
-
-/**
- * Apply field projection to a document.
- *
- * @param {object} doc
- * @param {object} projection { field: 1, field2: 0 }
- * @returns {object}
- */
 function applyProjection(doc, projection) {
   const includeFields = Object.entries(projection)
     .filter(([_, v]) => v)

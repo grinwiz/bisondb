@@ -1,20 +1,8 @@
-// bsonStreamDeleter.js
-// Async deleter for collection .bson files
-// Implements deleteOne and deleteMany by marking documents as _deleted
-// Supports optional autoCompact
-
 const fs = require('fs').promises;
 const { deserialize, serialize } = require('bson');
-const { matchesFilter } = require('./bsonStreamReader');
+const { matchesFilter } = require('../utils/QueryMatcher');
 const { compact } = require('./bsonStreamCompact');
 
-/**
- * deleteOne - marks the first matching document as deleted
- * @param {string} filePath
- * @param {object} filter
- * @param {object} options { autoCompact: boolean }
- * @returns {Promise<object>} { deletedCount }
- */
 async function deleteOne(filePath, filter, options = { autoCompact: true }) {
   const allDocs = await readAllDocs(filePath);
   let deletedCount = 0;
@@ -39,13 +27,6 @@ async function deleteOne(filePath, filter, options = { autoCompact: true }) {
   return { deletedCount };
 }
 
-/**
- * deleteMany - marks all matching documents as deleted
- * @param {string} filePath
- * @param {object} filter
- * @param {object} options { autoCompact: boolean }
- * @returns {Promise<object>} { deletedCount }
- */
 async function deleteMany(filePath, filter, options = { autoCompact: true }) {
   const allDocs = await readAllDocs(filePath);
   let deletedCount = 0;
@@ -69,9 +50,6 @@ async function deleteMany(filePath, filter, options = { autoCompact: true }) {
   return { deletedCount };
 }
 
-/**
- * Read all docs from file
- */
 async function readAllDocs(filePath) {
   const docs = [];
   try {
@@ -90,9 +68,6 @@ async function readAllDocs(filePath) {
   return docs;
 }
 
-/**
- * Write all docs back to file (overwrite)
- */
 async function writeAllDocs(filePath, docs) {
   const parts = [];
   for (const doc of docs) {
